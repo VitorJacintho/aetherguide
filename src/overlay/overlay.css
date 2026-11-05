@@ -1,0 +1,57 @@
+/* O overlay fica por cima do jogo: fundo transparente e painel translúcido. */
+body.overlay { background: transparent; overflow: hidden; font-size: 13px; }
+
+.ov-panel {
+  width: 340px; padding: 10px 12px; margin: 4px; display: grid; gap: 8px;
+  background: rgba(14, 12, 22, .78); border: 1px solid rgba(180, 140, 255, .35); border-radius: 12px;
+  text-shadow: 0 1px 2px #000;
+}
+.ov-head { display: flex; justify-content: space-between; align-items: center; }
+.ov-mode { font-size: .7rem; color: var(--muted); border: 1px solid var(--border); border-radius: 99px; padding: 0 8px; }
+.ov-mode.demo { color: var(--gold); border-color: var(--gold); }
+.ov-mode.off { color: var(--bad); border-color: var(--bad); }
+.ov-small { color: var(--muted); font-size: .8rem; margin: 0; }
+.ov-small code { font-size: .7rem; word-break: break-all; }
+.ov-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.ov-block { padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, .06); }
+.ov-row { display: flex; align-items: center; gap: 8px; }
+
+.ov-coach { display: flex; gap: 9px; align-items: center; background: rgba(95, 211, 154, .1); border: 1px solid rgba(95, 211, 154, .45); border-radius: 9px; padding: 6px 9px; }
+.ov-next { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ov-next b { font-size: 1.15rem; color: #b6ffd9; }
+.ov-ogcd { font-size: .78rem; color: var(--gold); display: inline-flex; align-items: center; gap: 4px; }
+.ov-why { font-size: .78rem; color: var(--muted); }
+
+.ov-bar { position: relative; flex: 1; height: 14px; border-radius: 7px; background: var(--bg-2); overflow: hidden; border: 1px solid var(--border); }
+.ov-bar > div { height: 100%; background: linear-gradient(90deg, #7a52ff, #c7a6ff); transition: width .1s linear; }
+.ov-bar span { position: absolute; inset: 0; display: grid; place-items: center; font-size: .7rem; }
+.ov-bar.urgent { border-color: var(--bad); animation: pulse .6s infinite alternate; }
+.ov-bar.urgent > div { background: var(--bad); }
+@keyframes pulse { from { box-shadow: 0 0 0 transparent; } to { box-shadow: 0 0 10px var(--bad); } }
+
+/* cooldowns no estilo da hotbar do jogo */
+.ov-cds { display: flex; gap: 6px; flex-wrap: wrap; }
+.ov-cd { position: relative; width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--border); }
+.ov-cd .action-icon, .ov-cd .status-icon { display: block; width: 36px; height: 36px; border-radius: 7px; filter: grayscale(1) brightness(.45); }
+.ov-cd .status-icon { object-fit: contain; }
+.ov-cd.ready { border-color: rgba(95, 211, 154, .7); }
+.ov-cd.ready .action-icon, .ov-cd.ready .status-icon { filter: none; }
+.ov-cd.active { border-color: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.ov-cd-time { position: absolute; inset: 0; display: grid; place-items: center; font-size: .95rem; color: #fff; text-shadow: 0 0 3px #000, 0 0 3px #000; }
+.ov-cd-charges { position: absolute; right: -3px; bottom: -3px; min-width: 15px; height: 15px; border-radius: 99px; background: #111; border: 1px solid var(--gold); color: var(--gold); font-size: .62rem; display: grid; place-items: center; }
+
+.ov-burst { background: linear-gradient(90deg, rgba(242, 201, 107, .3), rgba(255, 122, 61, .25)); border: 1px solid var(--gold); border-radius: 9px; padding: 5px 9px; font-weight: 700; color: var(--gold); }
+.ov-burst small { display: block; font-weight: 400; color: var(--text); font-size: .72rem; }
+
+.ov-food { font-size: .78rem; color: var(--warn); display: flex; align-items: center; gap: 6px; }
+
+.ov-chat { background: rgba(92, 200, 255, .08); border: 1px solid rgba(92, 200, 255, .35); border-radius: 9px; padding: 5px 9px; font-size: .78rem; animation: fadein .3s; }
+.ov-chat small { display: block; color: var(--muted); }
+.ov-chat small span { color: var(--ice); font-weight: 700; }
+@keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* gauge compacto dentro do overlay */
+body.overlay .gauge { gap: 6px; }
+body.overlay .pip { width: 11px; height: 11px; }
+body.overlay .mpbar { min-width: 0; height: 13px; }
+body.overlay .flag { font-size: .66rem; padding: 0 6px; }

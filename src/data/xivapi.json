@@ -1,0 +1,571 @@
+{
+  "source": "https://v2.xivapi.com",
+  "gameVersion": "0874aee069e1e7c4",
+  "fetchedAt": "2026-11-05T12:19:25.975Z",
+  "actions": {
+    "blizzard": {
+      "name": "Blizzard",
+      "ids": [
+        142
+      ],
+      "level": 1,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/blizzard.png"
+    },
+    "fire": {
+      "name": "Fire",
+      "ids": [
+        141
+      ],
+      "level": 2,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/fire.png"
+    },
+    "transpose": {
+      "name": "Transpose",
+      "ids": [
+        149
+      ],
+      "level": 4,
+      "recast": 5,
+      "baseRecast": 5,
+      "maxCharges": 0,
+      "icon": "icons/actions/transpose.png"
+    },
+    "thunder": {
+      "name": "Thunder",
+      "ids": [
+        144
+      ],
+      "level": 6,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/thunder.png"
+    },
+    "addle": {
+      "name": "Addle",
+      "ids": [
+        7560
+      ],
+      "level": 8,
+      "recast": 90,
+      "baseRecast": 90,
+      "maxCharges": 0,
+      "icon": "icons/actions/addle.png"
+    },
+    "sleep": {
+      "name": "Sleep",
+      "ids": [
+        25880
+      ],
+      "level": 10,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/sleep.png"
+    },
+    "blizzard2": {
+      "name": "Blizzard II",
+      "ids": [
+        25793
+      ],
+      "level": 12,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/blizzard2.png"
+    },
+    "lucid": {
+      "name": "Lucid Dreaming",
+      "ids": [
+        7562
+      ],
+      "level": 14,
+      "recast": 60,
+      "baseRecast": 60,
+      "maxCharges": 0,
+      "icon": "icons/actions/lucid.png"
+    },
+    "scathe": {
+      "name": "Scathe",
+      "ids": [
+        156
+      ],
+      "level": 15,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/scathe.png"
+    },
+    "fire2": {
+      "name": "Fire II",
+      "ids": [
+        147
+      ],
+      "level": 18,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/fire2.png"
+    },
+    "swiftcast": {
+      "name": "Swiftcast",
+      "ids": [
+        7561
+      ],
+      "level": 18,
+      "recast": 40,
+      "baseRecast": 60,
+      "maxCharges": 0,
+      "icon": "icons/actions/swiftcast.png"
+    },
+    "thunder2": {
+      "name": "Thunder II",
+      "ids": [
+        7447
+      ],
+      "level": 26,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/thunder2.png"
+    },
+    "manaward": {
+      "name": "Manaward",
+      "ids": [
+        157
+      ],
+      "level": 30,
+      "recast": 120,
+      "baseRecast": 120,
+      "maxCharges": 0,
+      "icon": "icons/actions/manaward.png"
+    },
+    "manafont": {
+      "name": "Manafont",
+      "ids": [
+        158
+      ],
+      "level": 30,
+      "recast": 100,
+      "baseRecast": 120,
+      "maxCharges": 0,
+      "icon": "icons/actions/manafont.png"
+    },
+    "fire3": {
+      "name": "Fire III",
+      "ids": [
+        152
+      ],
+      "level": 35,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/fire3.png"
+    },
+    "blizzard3": {
+      "name": "Blizzard III",
+      "ids": [
+        154
+      ],
+      "level": 35,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/blizzard3.png"
+    },
+    "umbralSoul": {
+      "name": "Umbral Soul",
+      "ids": [
+        16506
+      ],
+      "level": 35,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/umbralSoul.png"
+    },
+    "freeze": {
+      "name": "Freeze",
+      "ids": [
+        159
+      ],
+      "level": 40,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/freeze.png"
+    },
+    "surecast": {
+      "name": "Surecast",
+      "ids": [
+        7559
+      ],
+      "level": 44,
+      "recast": 120,
+      "baseRecast": 120,
+      "maxCharges": 0,
+      "icon": "icons/actions/surecast.png"
+    },
+    "thunder3": {
+      "name": "Thunder III",
+      "ids": [
+        153
+      ],
+      "level": 45,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/thunder3.png"
+    },
+    "flare": {
+      "name": "Flare",
+      "ids": [
+        162
+      ],
+      "level": 50,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/flare.png"
+    },
+    "aetherialManipulation": {
+      "name": "Aetherial Manipulation",
+      "ids": [
+        155
+      ],
+      "level": 50,
+      "recast": 10,
+      "baseRecast": 10,
+      "maxCharges": 0,
+      "icon": "icons/actions/aetherialManipulation.png"
+    },
+    "leyLines": {
+      "name": "Ley Lines",
+      "ids": [
+        3573
+      ],
+      "level": 52,
+      "recast": 120,
+      "baseRecast": 120,
+      "maxCharges": 2,
+      "icon": "icons/actions/leyLines.png"
+    },
+    "blizzard4": {
+      "name": "Blizzard IV",
+      "ids": [
+        3576
+      ],
+      "level": 58,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/blizzard4.png"
+    },
+    "fire4": {
+      "name": "Fire IV",
+      "ids": [
+        3577
+      ],
+      "level": 60,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/fire4.png"
+    },
+    "betweenTheLines": {
+      "name": "Between the Lines",
+      "ids": [
+        7419
+      ],
+      "level": 62,
+      "recast": 3,
+      "baseRecast": 3,
+      "maxCharges": 0,
+      "icon": "icons/actions/betweenTheLines.png"
+    },
+    "thunder4": {
+      "name": "Thunder IV",
+      "ids": [
+        7420
+      ],
+      "level": 64,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/thunder4.png"
+    },
+    "triplecast": {
+      "name": "Triplecast",
+      "ids": [
+        7421
+      ],
+      "level": 66,
+      "recast": 60,
+      "baseRecast": 60,
+      "maxCharges": 2,
+      "icon": "icons/actions/triplecast.png"
+    },
+    "foul": {
+      "name": "Foul",
+      "ids": [
+        7422
+      ],
+      "level": 70,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/foul.png"
+    },
+    "despair": {
+      "name": "Despair",
+      "ids": [
+        16505
+      ],
+      "level": 72,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/despair.png"
+    },
+    "xenoglossy": {
+      "name": "Xenoglossy",
+      "ids": [
+        16507
+      ],
+      "level": 80,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/xenoglossy.png"
+    },
+    "highFire2": {
+      "name": "High Fire II",
+      "ids": [
+        25794
+      ],
+      "level": 82,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/highFire2.png"
+    },
+    "highBlizzard2": {
+      "name": "High Blizzard II",
+      "ids": [
+        25795
+      ],
+      "level": 82,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/highBlizzard2.png"
+    },
+    "amplifier": {
+      "name": "Amplifier",
+      "ids": [
+        25796
+      ],
+      "level": 86,
+      "recast": 120,
+      "baseRecast": 120,
+      "maxCharges": 0,
+      "icon": "icons/actions/amplifier.png"
+    },
+    "paradox": {
+      "name": "Paradox",
+      "ids": [
+        25797
+      ],
+      "level": 90,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/paradox.png"
+    },
+    "highThunder": {
+      "name": "High Thunder",
+      "ids": [
+        36986
+      ],
+      "level": 92,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/highThunder.png"
+    },
+    "highThunder2": {
+      "name": "High Thunder II",
+      "ids": [
+        36987
+      ],
+      "level": 92,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/highThunder2.png"
+    },
+    "retrace": {
+      "name": "Retrace",
+      "ids": [
+        36988
+      ],
+      "level": 96,
+      "recast": 40,
+      "baseRecast": 40,
+      "maxCharges": 0,
+      "icon": "icons/actions/retrace.png"
+    },
+    "flareStar": {
+      "name": "Flare Star",
+      "ids": [
+        36989
+      ],
+      "level": 100,
+      "recast": 2.5,
+      "baseRecast": 2.5,
+      "maxCharges": 0,
+      "icon": "icons/actions/flareStar.png"
+    }
+  },
+  "statuses": {
+    "Thunderhead": {
+      "ids": [
+        3870
+      ],
+      "icon": "icons/status/thunderhead.png"
+    },
+    "Firestarter": {
+      "ids": [
+        165
+      ],
+      "icon": "icons/status/firestarter.png"
+    },
+    "Circle of Power": {
+      "ids": [
+        738
+      ],
+      "icon": "icons/status/circle-of-power.png"
+    },
+    "Well Fed": {
+      "ids": [
+        48
+      ],
+      "icon": "icons/status/well-fed.png"
+    },
+    "Triplecast": {
+      "ids": [
+        1211
+      ]
+    },
+    "Swiftcast": {
+      "ids": [
+        167,
+        1325,
+        1987
+      ]
+    },
+    "High Thunder": {
+      "ids": [
+        3871,
+        3872
+      ]
+    },
+    "Thunder": {
+      "ids": [
+        161,
+        1324
+      ]
+    },
+    "Thunder II": {
+      "ids": [
+        162,
+        2075
+      ]
+    },
+    "Thunder III": {
+      "ids": [
+        163
+      ]
+    },
+    "Thunder IV": {
+      "ids": [
+        1210
+      ]
+    },
+    "Divination": {
+      "ids": [
+        1878,
+        2034
+      ]
+    },
+    "Battle Litany": {
+      "ids": [
+        786,
+        1414
+      ]
+    },
+    "Brotherhood": {
+      "ids": [
+        1185,
+        2174
+      ]
+    },
+    "Technical Finish": {
+      "ids": [
+        1822,
+        2050
+      ]
+    },
+    "Embolden": {
+      "ids": [
+        1239,
+        1297,
+        2282
+      ]
+    },
+    "Searing Light": {
+      "ids": [
+        2703
+      ]
+    },
+    "Arcane Circle": {
+      "ids": [
+        2599
+      ]
+    },
+    "Battle Voice": {
+      "ids": [
+        141
+      ]
+    },
+    "Radiant Finale": {
+      "ids": [
+        2722,
+        2964
+      ]
+    },
+    "Starry Muse": {
+      "ids": [
+        3685
+      ]
+    },
+    "Chain Stratagem": {
+      "ids": [
+        1221,
+        1406
+      ]
+    },
+    "Dokumori": {
+      "ids": [
+        3849,
+        4303
+      ]
+    }
+  }
+}
