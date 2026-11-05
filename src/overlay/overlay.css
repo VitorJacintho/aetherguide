@@ -6,6 +6,11 @@ body.overlay { background: transparent; overflow: hidden; font-size: 13px; }
   background: rgba(14, 12, 22, .78); border: 1px solid rgba(180, 140, 255, .35); border-radius: 12px;
   text-shadow: 0 1px 2px #000;
 }
+/* app desktop: overlay destravado pode ser arrastado */
+body.ov-unlocked .ov-panel { outline: 2px dashed var(--gold); outline-offset: 2px; -webkit-app-region: drag; cursor: move; }
+.ov-dragbar { font-size: .72rem; color: #1a1030; background: var(--gold); border-radius: 7px; padding: 3px 8px; text-align: center; text-shadow: none; }
+.ov-dragbar b { color: #1a1030; }
+
 .ov-head { display: flex; justify-content: space-between; align-items: center; }
 .ov-mode { font-size: .7rem; color: var(--muted); border: 1px solid var(--border); border-radius: 99px; padding: 0 8px; }
 .ov-mode.demo { color: var(--gold); border-color: var(--gold); }

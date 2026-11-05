@@ -77,7 +77,7 @@ interface Combatant {
   Level: number;
 }
 
-export async function startLive(): Promise<ConnectionMode> {
+export function startLive(onMode: (m: ConnectionMode) => void): void {
   on('LogLine', (e) => handleLine(e.line as string[]));
   on('ChangePrimaryPlayer', (e) => {
     playerId = Number(e.charID).toString(16).toUpperCase();
@@ -93,10 +93,9 @@ export async function startLive(): Promise<ConnectionMode> {
     if (d.job === 'BLM' && d.jobDetail) tracker.setGauge(d.jobDetail);
   });
 
-  const mode = await connect(['LogLine', 'ChangePrimaryPlayer', 'onPlayerChangedEvent']);
-  if (mode === 'offline') return mode;
+  connect(['LogLine', 'ChangePrimaryPlayer', 'onPlayerChangedEvent'], onMode);
 
-  // Sem cactbot, pega MP/nível/job do jogador a cada segundo
+  // Sem cactbot, pega MP/nível/job do jogador a cada segundo (sem conexão, call() devolve null)
   setInterval(async () => {
     if (!playerName || tracker.get().gaugeSource === 'cactbot') return;
     const res = await call<{ combatants: Combatant[] }>({ call: 'getCombatants', names: [playerName] });
@@ -105,6 +104,4 @@ export async function startLive(): Promise<ConnectionMode> {
     tracker.setMp(me.CurrentMP);
     tracker.setPlayer({ level: me.Level, isBlm: me.Job === BLM_JOB_ID });
   }, 1000);
-
-  return mode;
 }

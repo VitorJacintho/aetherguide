@@ -58,8 +58,10 @@ FFXIV é enorme e pouco amigável para quem chega agora:
    Próximos passos: comparar com o melhor parse da mesma luta e explicar mecânicas por timestamp.
 4. **Guia de dungeon/trial**: mecânicas de cada conteúdo em linguagem simples, com foco no
    que o BLM precisa fazer (onde colocar Ley Lines, quando usar Addle).
-5. **App desktop** (Tauri ou Electron): ícone na bandeja, janela de overlay própria e
-   atalhos globais para frases prontas.
+5. ~~**App desktop**~~ ✅ Electron: janela de overlay própria (transparente, sempre por cima,
+   clique atravessa), bandeja, atalhos globais, instalador e versão portátil.
+   Próximos passos: vários overlays independentes, escala/opacidade, atalhos para frases prontas
+   e atualização automática.
 6. **Outros jobs**: a estrutura de dados (`src/data/blm`, `src/engine/blm.ts`) foi feita
    para ser repetida por job.
 

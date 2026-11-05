@@ -56,17 +56,24 @@ function wsUrlFromQuery(): string | null {
   return null;
 }
 
+export const RETRY_SECONDS = 5;
+
+/** URL do WebSocket configurada na página (null = modo plugin dentro do ACT). */
+export const websocketUrl = wsUrlFromQuery;
+
 /**
- * Conecta e assina os eventos. Resolve com o modo final de conexão.
- * Espera até `timeoutMs` pela API do ACT aparecer antes de desistir.
+ * Conecta e assina os eventos, avisando cada mudança de estado em `onMode`.
+ *  - WebSocket: se cair ou o ACT/IINACT ainda não estiver aberto, tenta de novo
+ *    a cada RETRY_SECONDS (o app desktop pode abrir antes do ACT).
+ *  - Plugin (dentro do ACT): espera até `timeoutMs` pela API aparecer.
  */
-export function connect(events: string[], timeoutMs = 3000): Promise<ConnectionMode> {
+export function connect(events: string[], onMode: (m: ConnectionMode) => void, timeoutMs = 3000): void {
   const wsUrl = wsUrlFromQuery();
 
   if (wsUrl) {
-    return new Promise((resolve) => {
-      let seq = 0;
-      const pending = new Map<number, (d: any) => void>();
+    let seq = 0;
+    const pending = new Map<number, (d: any) => void>();
+    const open = () => {
       const ws = new WebSocket(wsUrl);
       ws.addEventListener('message', (msg) => {
         const data = JSON.parse(msg.data);
@@ -86,27 +93,33 @@ export function connect(events: string[], timeoutMs = 3000): Promise<ConnectionM
           ws.send(JSON.stringify(obj));
         };
         send({ call: 'subscribe', events });
-        resolve('websocket');
+        onMode('websocket');
       });
-      ws.addEventListener('error', () => resolve('offline'));
-    });
+      // 'error' sempre vem seguido de 'close'
+      ws.addEventListener('close', () => {
+        send = null;
+        pending.clear();
+        onMode('offline');
+        setTimeout(open, RETRY_SECONDS * 1000);
+      });
+    };
+    open();
+    return;
   }
 
-  return new Promise((resolve) => {
-    const started = Date.now();
-    const tryApi = () => {
-      const api = window.OverlayPluginApi;
-      if (api && api.ready) {
-        window.__OverlayCallback = dispatch;
-        send = (obj, cb) => api.callHandler(JSON.stringify(obj), cb);
-        send({ call: 'subscribe', events });
-        resolve('plugin');
-      } else if (Date.now() - started > timeoutMs) {
-        resolve('offline');
-      } else {
-        setTimeout(tryApi, 250);
-      }
-    };
-    tryApi();
-  });
+  const started = Date.now();
+  const tryApi = () => {
+    const api = window.OverlayPluginApi;
+    if (api && api.ready) {
+      window.__OverlayCallback = dispatch;
+      send = (obj, cb) => api.callHandler(JSON.stringify(obj), cb);
+      send({ call: 'subscribe', events });
+      onMode('plugin');
+    } else if (Date.now() - started > timeoutMs) {
+      onMode('offline');
+    } else {
+      setTimeout(tryApi, 250);
+    }
+  };
+  tryApi();
 }

@@ -7,9 +7,32 @@ Visão completa, ideias e roadmap em [docs/VISAO.md](docs/VISAO.md).
 
 ```bash
 npm install
-npm run dev        # app em http://localhost:5173 e overlay em /overlay.html
+npm run dev        # versão web em http://localhost:5173 e overlay em /overlay.html
 npm run build      # gera dist/ (abre direto do disco, inclusive no ACT)
 ```
+
+## App desktop (Windows)
+
+O Aetherguide também roda como aplicativo (Electron), com uma **janela de overlay própria**:
+transparente, sempre por cima do jogo e com os cliques passando para o jogo quando travada.
+
+```bash
+npm run app:dev    # desenvolvimento: Vite + Electron com recarga automática
+npm run app        # build e abre o app
+npm run dist:win   # gera release/Aetherguide-<versão>-instalador.exe e -portatil.exe
+npm run app:selftest  # abre o app, tira capturas das janelas e confere overlay/bandeja/atalhos
+```
+
+- **Atalhos globais:** `Ctrl+Shift+O` mostra/oculta o overlay, `Ctrl+Shift+L` trava/destrava (destravado dá
+  para arrastar). Também ficam no ícone da bandeja.
+- **Fechar a janela principal** não fecha o overlay; para sair, use a bandeja.
+- **Dados do jogo:** vêm do ACT (aba *OverlayPlugin WSServer → Start*) ou do IINACT, pelo WebSocket
+  `ws://127.0.0.1:10501/ws`. Sem eles, o overlay fica aguardando e reconecta sozinho. Há um modo demonstração.
+- **O FFXIV precisa estar em *Borderless Windowed*.** Em tela cheia exclusiva nenhum overlay aparece por cima.
+- O `.exe` não é assinado digitalmente: na primeira vez o Windows pode mostrar "O Windows protegeu o computador" →
+  *Mais informações* → *Executar assim mesmo*.
+- Configurações (posição do overlay, módulos, fonte de dados) ficam em `%APPDATA%\aetherguide\settings.json`.
+- Código em `electron/` (processo principal e preload). O ícone é gerado por `node scripts/make-icon.mjs`.
 
 ## O que tem
 

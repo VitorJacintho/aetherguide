@@ -2,7 +2,8 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Gauge } from '../components/Gauge';
 import { ActionIcon, StatusIcon } from '../components/ActionIcon';
 import { ACTION_NAMES, DOT_DURATION, cooldownRemaining, recommend, type OgcdId } from '../engine/blm';
-import type { ConnectionMode } from './overlayApi';
+import { RETRY_SECONDS, websocketUrl, type ConnectionMode } from './overlayApi';
+import { desktop } from '../desktop';
 import { startDemo } from './demo';
 import { startLive } from './live';
 import { tracker } from './tracker';
@@ -23,16 +24,39 @@ const MODE_LABEL: Record<ConnectionMode | 'demo', string> = {
   demo: 'demo',
 };
 
+/** No app desktop: overlay destravado mostra borda e pode ser arrastado. */
+function useUnlocked(): boolean {
+  const [unlocked, setUnlocked] = useState(false);
+  useEffect(() => {
+    if (!desktop) return;
+    desktop.getSettings().then((s) => setUnlocked(!s.overlay.locked));
+    return desktop.onLock((locked) => setUnlocked(!locked));
+  }, []);
+  useEffect(() => {
+    document.body.classList.toggle('ov-unlocked', unlocked);
+  }, [unlocked]);
+  return unlocked;
+}
+
+function UnlockBar() {
+  return (
+    <div className="ov-dragbar">
+      ⠿ Arraste para posicionar · <b>{desktop?.shortcuts.lock}</b> trava e deixa os cliques passarem
+    </div>
+  );
+}
+
 export default function Overlay() {
   const snap = useSyncExternalStore(tracker.subscribe, tracker.get);
   const [mode, setMode] = useState<ConnectionMode | 'demo'>(isDemo ? 'demo' : 'connecting');
+  const unlocked = useUnlocked();
 
   useEffect(() => {
     if (isDemo) {
       startDemo();
       return;
     }
-    startLive().then(setMode);
+    startLive(setMode);
     const t = setInterval(() => tracker.tick(), 100);
     return () => clearInterval(t);
   }, []);
@@ -41,21 +65,31 @@ export default function Overlay() {
   const advice = recommend(blm);
   const foodLeft = snap.foodUntil === null ? null : snap.foodUntil - now;
   const notBlm = snap.player.isBlm === false;
+  const wsUrl = websocketUrl();
 
-  if (mode === 'offline') {
+  if (mode === 'offline' || (mode === 'connecting' && wsUrl)) {
     return (
       <div className="ov-panel">
-        <div className="ov-head"><b>Aetherguide</b><span className="ov-mode off">desconectado</span></div>
-        <p className="ov-small">
-          Não encontrei o OverlayPlugin. Adicione esta página como overlay no ACT/IINACT, use
-          <code>?OVERLAY_WS=ws://127.0.0.1:10501/ws</code> ou abra com <code>?demo=1</code> para testar.
-        </p>
+        {unlocked && <UnlockBar />}
+        <div className="ov-head"><b>Aetherguide</b><span className="ov-mode off">{mode === 'offline' ? 'desconectado' : 'conectando…'}</span></div>
+        {wsUrl ? (
+          <p className="ov-small">
+            Aguardando o ACT ou IINACT em <code>{wsUrl}</code>. Tentando de novo a cada {RETRY_SECONDS} s.
+            {desktop && ' Para ver um exemplo, ative o modo demonstração na bandeja ou na página Overlay do app.'}
+          </p>
+        ) : (
+          <p className="ov-small">
+            Não encontrei o OverlayPlugin. Adicione esta página como overlay no ACT/IINACT, use
+            <code>?OVERLAY_WS=ws://127.0.0.1:10501/ws</code> ou abra com <code>?demo=1</code> para testar.
+          </p>
+        )}
       </div>
     );
   }
 
   return (
     <div className="ov-panel">
+      {unlocked && <UnlockBar />}
       <div className="ov-head">
         <b>BLM {snap.player.level ? `· nv ${snap.player.level}` : ''}</b>
         <span className={`ov-mode ${mode === 'demo' ? 'demo' : ''}`}>

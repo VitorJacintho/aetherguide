@@ -1,15 +1,84 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { OVERLAY_MODULES, type ModuleId } from '../overlay/modules';
 import { XIVAPI_INFO } from '../data/xivapi';
+import { desktop, type DesktopApi, type DesktopSettings, type OverlaySettings } from '../desktop';
+
+/** Controles do overlay quando a página roda dentro do app desktop. */
+function DesktopPanel({ api }: { api: DesktopApi }) {
+  const [s, setS] = useState<DesktopSettings | null>(null);
+  const [wsDraft, setWsDraft] = useState('');
+
+  useEffect(() => {
+    api.getSettings().then((x) => {
+      setS(x);
+      setWsDraft(x.overlay.wsUrl);
+    });
+    return api.onSettings(setS);
+  }, [api]);
+
+  if (!s) return null;
+  const o = s.overlay;
+  const set = (patch: Partial<OverlaySettings> & { resetPosition?: boolean }) => api.setOverlay(patch).then(setS);
+
+  return (
+    <div className="card" data-desktop-panel style={{ borderColor: 'var(--accent)', marginBottom: 14 }}>
+      <h3>🖥️ Overlay do app</h3>
+      <div className="chips">
+        <button className="btn primary" onClick={() => set({ visible: !o.visible })}>{o.visible ? 'Ocultar overlay' : 'Mostrar overlay'}</button>
+        <button className="btn" onClick={() => set({ locked: !o.locked })}>
+          {o.locked ? '🔓 Destravar para mover' : '🔒 Travar (cliques passam para o jogo)'}
+        </button>
+        <button className="btn" onClick={() => set({ resetPosition: true })}>Posição padrão</button>
+      </div>
+      <p className="muted" style={{ marginTop: 10 }}>
+        Atalhos que funcionam até dentro do jogo: <kbd>{api.shortcuts.toggle}</kbd> mostra/oculta ·{' '}
+        <kbd>{api.shortcuts.lock}</kbd> trava/destrava. Fechar esta janela não fecha o overlay — use o ícone na bandeja para sair.
+      </p>
+
+      <h4 style={{ margin: '14px 0 4px' }}>De onde vêm os dados</h4>
+      <label className="check">
+        <input type="radio" name="source" checked={o.source === 'ws'} onChange={() => set({ source: 'ws' })} />
+        <span style={{ flex: 1 }}>
+          <b>ACT ou IINACT (jogo de verdade)</b>
+          <span style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+            <input type="text" value={wsDraft} onChange={(e) => setWsDraft(e.target.value)} style={{ flex: 1 }} />
+            <button className="btn small" disabled={wsDraft === o.wsUrl} onClick={() => set({ wsUrl: wsDraft, source: 'ws' })}>Salvar</button>
+          </span>
+        </span>
+      </label>
+      <label className="check">
+        <input type="radio" name="source" checked={o.source === 'demo'} onChange={() => set({ source: 'demo' })} />
+        <span><b>Demonstração</b> — luta simulada, para testar sem abrir o jogo</span>
+      </label>
+
+      <div className="callout" style={{ marginBottom: 0 }}>
+        <b>Para usar no jogo:</b>
+        <ol style={{ margin: '6px 0 0', paddingLeft: 18 }}>
+          <li>No FFXIV: <i>System Configuration → Display Settings → Screen Mode</i> = <b>Borderless Windowed</b>. Em tela cheia
+            exclusiva nenhum overlay aparece por cima.</li>
+          <li>Abra o <b>ACT</b> (com o plugin do FFXIV e o OverlayPlugin) e, na aba <i>OverlayPlugin WSServer</i>, clique em
+            <b> Start</b> — ou use o <b>IINACT</b>, que já liga o WebSocket na porta 10501.</li>
+          <li>Opcional e recomendado: <b>cactbot</b>, para o gauge vir direto do jogo.</li>
+        </ol>
+      </div>
+    </div>
+  );
+}
 
 export default function OverlayInfo() {
   const [enabled, setEnabled] = useState<Set<ModuleId>>(() => new Set(OVERLAY_MODULES.map((m) => m.id)));
+
+  // no app desktop, os módulos escolhidos aqui valem para a janela de overlay
+  useEffect(() => {
+    desktop?.getSettings().then((s) => setEnabled(new Set(s.overlay.modules as ModuleId[])));
+  }, []);
 
   const toggle = (id: ModuleId) =>
     setEnabled((s) => {
       const n = new Set(s);
       if (n.has(id)) n.delete(id);
       else n.add(id);
+      desktop?.setOverlay({ modules: [...n] });
       return n;
     });
 
@@ -27,6 +96,8 @@ export default function OverlayInfo() {
         de log que ferramentas como o ACT usam) e mostra dicas em tempo real.
       </p>
 
+      {desktop && <DesktopPanel api={desktop} />}
+
       <div className="grid grid-2">
         <div className="card">
           <h3>Escolha os módulos</h3>
@@ -43,7 +114,7 @@ export default function OverlayInfo() {
         </div>
       </div>
 
-      <h2>Como instalar</h2>
+      <h2>{desktop ? 'Alternativa: usar dentro do próprio ACT' : 'Como instalar'}</h2>
       <div className="grid grid-2">
         <div className="card">
           <h3>Opção A — ACT + OverlayPlugin</h3>
