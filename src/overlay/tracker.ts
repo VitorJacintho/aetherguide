@@ -36,7 +36,15 @@ export const RAID_BUFFS = new Set([
 const DOT_NAMES = new Set(['High Thunder', 'Thunder III', 'Thunder', 'Thunder II', 'Thunder IV']);
 const CHAT_NOTE_TTL = 14;
 
-export const clock = () => performance.now() / 1000;
+/**
+ * Relógio do overlay em segundos. Na reprodução de gravações ele vira um relógio
+ * "virtual" que pode andar 2x, 4x… mais rápido, e todos os timers acompanham.
+ */
+let clockFn = () => performance.now() / 1000;
+export const clock = () => clockFn();
+export function setClock(fn: () => number) {
+  clockFn = fn;
+}
 
 class Tracker {
   private snap: Snapshot;
@@ -81,9 +89,18 @@ class Tracker {
     });
   }
 
+  /** Volta ao estado inicial usando o relógio atual (chamar depois de setClock). */
   reset() {
     const now = clock();
-    this.set({ blm: { ...initialState(), time: now }, burst: null, lastAction: null });
+    this.set({
+      blm: { ...initialState(), time: now },
+      now,
+      burst: null,
+      foodUntil: null,
+      chat: [],
+      lastAction: null,
+      gaugeSource: 'inferido',
+    });
   }
 
   /* ---------- entradas ---------- */

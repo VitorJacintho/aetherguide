@@ -1,6 +1,9 @@
 node_modules/
 dist/
 release/
+# gravações de sessão usadas em desenvolvimento (contêm nomes e chat)
+recordings/
+*.agrec
 *.log
 .DS_Store
 .claude/settings.local.json

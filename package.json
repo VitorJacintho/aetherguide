@@ -2,7 +2,7 @@
   "name": "aetherguide",
   "productName": "Aetherguide",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Companheiro para iniciantes de Final Fantasy XIV — começando pelo Black Mage.",
   "author": "VitorJacintho",
@@ -16,7 +16,9 @@
     "app:dev": "node scripts/dev-app.mjs",
     "app": "npm run build && electron .",
     "app:selftest": "npm run build && electron . --selftest",
-    "dist:win": "npm run build && electron-builder --win"
+    "dist:win": "npm run build && electron-builder --win",
+    "fake-act": "node --experimental-strip-types --no-warnings scripts/fake-act.ts",
+    "rec:info": "node scripts/rec-info.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
@@ -28,7 +30,8 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "typescript": "^7.0.2",
-    "vite": "^8.3.6"
+    "vite": "^8.3.6",
+    "ws": "^8.22.1"
   },
   "build": {
     "appId": "io.github.vitorjacintho.aetherguide",

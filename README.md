@@ -32,6 +32,22 @@ npm run app:selftest  # abre o app, tira capturas das janelas e confere overlay/
 - O `.exe` não é assinado digitalmente: na primeira vez o Windows pode mostrar "O Windows protegeu o computador" →
   *Mais informações* → *Executar assim mesmo*.
 - Configurações (posição do overlay, módulos, fonte de dados) ficam em `%APPDATA%\aetherguide\settings.json`.
+
+### Gravações de sessão
+
+Na página **Overlay** do app (ou com `Ctrl+Shift+R`, inclusive dentro do jogo) dá para gravar tudo o que o
+ACT/IINACT envia e depois **reproduzir a luta no overlay** em 1x ou 4x.
+
+- Arquivos `.agrec` em `Documentos\Aetherguide\Gravacoes` (JSON Lines, salvos aos poucos a cada 2 s).
+- Ficam de fora: linhas muito frequentes que não usamos (HP, depuração) e, por padrão, tells/FC/linkshells.
+- `npm run rec:info -- <arquivo.agrec>` resume uma gravação no terminal.
+- Na versão web: `overlay.html?replay=<url-do-arquivo>&speed=4`.
+
+### Simulador de ACT (desenvolvimento)
+
+`npm run fake-act` sobe um servidor WebSocket que imita o OverlayPlugin (porta 10501) e transmite uma luta de
+Black Mage gerada pelo motor de regras. Serve para testar o app, o overlay e as gravações sem abrir o jogo.
+Use `PORT=10599 npm run fake-act` se o ACT estiver aberto.
 - Código em `electron/` (processo principal e preload). O ícone é gerado por `node scripts/make-icon.mjs`.
 
 ## O que tem

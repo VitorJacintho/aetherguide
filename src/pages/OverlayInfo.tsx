@@ -1,7 +1,123 @@
 import { useEffect, useMemo, useState } from 'react';
 import { OVERLAY_MODULES, type ModuleId } from '../overlay/modules';
 import { XIVAPI_INFO } from '../data/xivapi';
-import { desktop, type DesktopApi, type DesktopSettings, type OverlaySettings } from '../desktop';
+import {
+  desktop, type DesktopApi, type DesktopSettings, type OverlaySettings, type RecorderStatus, type RecordingInfo,
+} from '../desktop';
+
+const mmss = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')}`;
+const size = (b: number) => (b > 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1)} MB` : `${Math.ceil(b / 1024)} KB`);
+
+/** Gravações de sessão: gravar, listar, reproduzir no overlay e excluir. */
+function RecordingsPanel({ api }: { api: DesktopApi }) {
+  const [status, setStatus] = useState<RecorderStatus | null>(null);
+  const [list, setList] = useState<RecordingInfo[]>([]);
+  const [s, setS] = useState<DesktopSettings | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const refresh = () => api.listRecordings().then(setList);
+    api.getRecorderStatus().then(setStatus);
+    api.getSettings().then(setS);
+    refresh();
+    const offs = [api.onRecorderStatus(setStatus), api.onRecordingsChanged(refresh), api.onSettings(setS)];
+    return () => offs.forEach((off) => off());
+  }, [api]);
+
+  async function toggle() {
+    setError(null);
+    const r = await api.toggleRecording();
+    if (!r.ok) setError(r.error ?? 'Não foi possível gravar.');
+  }
+
+  async function remove(name: string) {
+    if (!window.confirm(`Excluir a gravação "${name}"?`)) return;
+    try {
+      await api.deleteRecording(name);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  if (!s) return null;
+  const recording = !!status?.recording;
+  const live = s.overlay.source === 'ws';
+
+  return (
+    <div className="card" data-recordings-panel style={{ marginBottom: 14 }}>
+      <h3>⏺ Gravações de sessão</h3>
+      <p className="muted">
+        Grava tudo o que o ACT/IINACT envia enquanto você joga. Depois dá para reproduzir a luta no overlay — e, se você
+        mandar o arquivo, eu uso para melhorar o Aetherguide com dados reais.
+      </p>
+      <div className="chips">
+        <button className={`btn ${recording ? '' : 'primary'}`} onClick={toggle} disabled={!recording && !live}>
+          {recording ? `■ Parar gravação (${mmss(status!.durationMs)} · ${status!.events.toLocaleString('pt-BR')} eventos)` : '● Gravar sessão'}
+        </button>
+        <button className="btn" onClick={() => api.openRecordingsFolder()}>📂 Abrir pasta</button>
+        <span className="muted" style={{ fontSize: '.85rem' }}>Atalho no jogo: <kbd>{api.shortcuts.record}</kbd></span>
+      </div>
+      {!live && !recording && (
+        <p className="muted" style={{ fontSize: '.85rem' }}>Para gravar, escolha a fonte "ACT ou IINACT" acima.</p>
+      )}
+      <label className="check" style={{ borderBottom: 'none' }}>
+        <input type="checkbox" checked={s.recorder.includePrivateChat}
+          onChange={(e) => api.setRecorderOptions({ includePrivateChat: e.target.checked })} />
+        <span>
+          Incluir mensagens privadas (tells), de FC e de linkshells
+          <br /><small className="muted">Desligado por padrão. Mensagens públicas e da party sempre entram (o tradutor de gírias usa).</small>
+        </span>
+      </label>
+      {error && <div className="feedback bad">{error}</div>}
+
+      {s.overlay.source === 'replay' && (
+        <div className="callout" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+          <span>▶ O overlay está reproduzindo <b>{s.overlay.replayFile}</b> ({s.overlay.replaySpeed}x).</span>
+          <button className="btn small" onClick={() => api.setOverlay({ source: 'ws' })}>Voltar ao jogo ao vivo</button>
+        </div>
+      )}
+
+      {list.length === 0 ? (
+        <p className="muted" style={{ marginBottom: 0 }}>Nenhuma gravação ainda.</p>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
+          <table>
+            <thead>
+              <tr><th>Gravação</th><th>Duração</th><th>Eventos</th><th>Personagem / zona</th><th>Tamanho</th><th></th></tr>
+            </thead>
+            <tbody>
+              {list.map((r) => {
+                const active = recording && status?.name === r.name;
+                return (
+                  <tr key={r.name}>
+                    <td>
+                      {new Date(r.startedAt ?? r.modified).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
+                      {active && <span className="badge fire" style={{ marginLeft: 6 }}>gravando</span>}
+                      {r.incomplete && <span className="badge" style={{ marginLeft: 6 }} title="O app fechou durante a gravação">incompleta</span>}
+                      <div className="muted" style={{ fontSize: '.75rem' }}>{r.name}</div>
+                    </td>
+                    <td>{r.durationMs !== null ? mmss(r.durationMs) : '—'}</td>
+                    <td>{r.events !== null ? r.events.toLocaleString('pt-BR') : '—'}</td>
+                    <td>{r.player ?? '—'}{r.zones.length > 0 && <div className="muted" style={{ fontSize: '.75rem' }}>{r.zones.join(', ')}</div>}</td>
+                    <td>{size(r.bytes)}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>
+                      <button className="btn small" disabled={active} onClick={() => api.playRecording(r.name, 1)} title="Reproduzir no overlay">▶ 1x</button>{' '}
+                      <button className="btn small" disabled={active} onClick={() => api.playRecording(r.name, 4)} title="Reproduzir 4x mais rápido">▶ 4x</button>{' '}
+                      <button className="btn small" disabled={active} onClick={() => remove(r.name)} title="Excluir">🗑</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <p className="muted" style={{ fontSize: '.8rem', marginTop: 10, marginBottom: 0 }}>
+        As gravações contêm nomes de personagens e mensagens do chat público/party. Revise antes de compartilhar publicamente.
+      </p>
+    </div>
+  );
+}
 
 /** Controles do overlay quando a página roda dentro do app desktop. */
 function DesktopPanel({ api }: { api: DesktopApi }) {
@@ -97,6 +213,7 @@ export default function OverlayInfo() {
       </p>
 
       {desktop && <DesktopPanel api={desktop} />}
+      {desktop && <RecordingsPanel api={desktop} />}
 
       <div className="grid grid-2">
         <div className="card">

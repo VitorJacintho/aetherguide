@@ -11,6 +11,14 @@ body.ov-unlocked .ov-panel { outline: 2px dashed var(--gold); outline-offset: 2p
 .ov-dragbar { font-size: .72rem; color: #1a1030; background: var(--gold); border-radius: 7px; padding: 3px 8px; text-align: center; text-shadow: none; }
 .ov-dragbar b { color: #1a1030; }
 
+/* gravação e reprodução */
+.ov-rec { font-size: .7rem; color: #fff; background: var(--bad); border-radius: 99px; padding: 0 8px; animation: pulse-rec 1s infinite alternate; }
+@keyframes pulse-rec { from { opacity: 1; } to { opacity: .55; } }
+.ov-replay { display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; font-size: .72rem; color: var(--gold); border: 1px solid #f2c96b66; border-radius: 7px; padding: 4px 8px; }
+.ov-replay.error { display: block; color: var(--bad); border-color: var(--bad); }
+.ov-replay-track { grid-column: 1 / -1; height: 4px; background: var(--bg-2); border-radius: 2px; overflow: hidden; }
+.ov-replay-track > div { height: 100%; background: var(--gold); }
+
 .ov-head { display: flex; justify-content: space-between; align-items: center; }
 .ov-mode { font-size: .7rem; color: var(--muted); border: 1px solid var(--border); border-radius: 99px; padding: 0 8px; }
 .ov-mode.demo { color: var(--gold); border-color: var(--gold); }

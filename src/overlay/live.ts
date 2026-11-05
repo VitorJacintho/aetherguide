@@ -77,7 +77,27 @@ interface Combatant {
   Level: number;
 }
 
+/**
+ * Eventos assinados no ACT/IINACT. ChangeZone, PartyChanged e InCombat ainda não são
+ * usados pelo overlay, mas entram nas gravações para funcionalidades futuras
+ * (resumo pós-luta, avisos de mecânica).
+ */
+export const SUBSCRIBED_EVENTS = ['LogLine', 'ChangePrimaryPlayer', 'onPlayerChangedEvent', 'ChangeZone', 'PartyChanged', 'InCombat'];
+
+/** Conectado ao ACT/IINACT de verdade. */
 export function startLive(onMode: (m: ConnectionMode) => void): void {
+  registerHandlers();
+  connect(SUBSCRIBED_EVENTS, onMode);
+  startPolling();
+}
+
+/** Mesmo processamento do modo ao vivo, mas os eventos vêm de uma gravação. */
+export function startFromRecording(): void {
+  registerHandlers();
+  startPolling();
+}
+
+function registerHandlers() {
   on('LogLine', (e) => handleLine(e.line as string[]));
   on('ChangePrimaryPlayer', (e) => {
     playerId = Number(e.charID).toString(16).toUpperCase();
@@ -92,9 +112,9 @@ export function startLive(onMode: (m: ConnectionMode) => void): void {
     if (typeof d.currentMP === 'number') tracker.setMp(d.currentMP);
     if (d.job === 'BLM' && d.jobDetail) tracker.setGauge(d.jobDetail);
   });
+}
 
-  connect(['LogLine', 'ChangePrimaryPlayer', 'onPlayerChangedEvent'], onMode);
-
+function startPolling() {
   // Sem cactbot, pega MP/nível/job do jogador a cada segundo (sem conexão, call() devolve null)
   setInterval(async () => {
     if (!playerName || tracker.get().gaugeSource === 'cactbot') return;

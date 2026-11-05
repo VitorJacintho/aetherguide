@@ -5,24 +5,106 @@ import { ACTION_NAMES, DOT_DURATION, cooldownRemaining, recommend, type OgcdId }
 import { RETRY_SECONDS, websocketUrl, type ConnectionMode } from './overlayApi';
 import { desktop } from '../desktop';
 import { startDemo } from './demo';
-import { startLive } from './live';
+import { startFromRecording, startLive } from './live';
+import { Recorder, parseRecording, startReplay } from './recording';
 import { tracker } from './tracker';
 import { ALL_MODULE_IDS, type ModuleId } from './modules';
 
 const params = new URLSearchParams(window.location.search);
 const isDemo = params.get('demo') === '1';
+/** reprodução: `replay=<url>` (navegador) ou `replayFile=<nome>` (app desktop) */
+const replayUrl = params.get('replay');
+const replayFile = params.get('replayFile');
+const isReplay = !!(replayUrl || replayFile);
+const replaySpeed = Math.min(16, Math.max(0.25, Number(params.get('speed')) || 1));
 const modules = new Set<ModuleId>(
   params.get('modules')?.split(',').filter((m): m is ModuleId => (ALL_MODULE_IDS as string[]).includes(m)) ?? ALL_MODULE_IDS,
 );
 
+type Mode = ConnectionMode | 'demo' | 'replay';
 const CD_LIST: OgcdId[] = ['leyLines', 'triplecast', 'swiftcast', 'manafont', 'amplifier'];
-const MODE_LABEL: Record<ConnectionMode | 'demo', string> = {
+const MODE_LABEL: Record<Mode, string> = {
   connecting: 'conectando…',
   plugin: 'ACT',
   websocket: 'WebSocket',
   offline: 'desconectado',
   demo: 'demo',
+  replay: 'gravação',
 };
+const mmss = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')}`;
+
+interface ReplayState {
+  progressMs: number;
+  durationMs: number;
+  ended: boolean;
+  error: string | null;
+}
+
+/** Carrega e reproduz a gravação indicada na URL. */
+function useReplay(): ReplayState | null {
+  const [st, setSt] = useState<ReplayState | null>(isReplay ? { progressMs: 0, durationMs: 0, ended: false, error: null } : null);
+  useEffect(() => {
+    if (!isReplay) return;
+    let stop: (() => void) | null = null;
+    const load = replayFile && desktop ? desktop.readRecording(replayFile) : fetch(replayUrl!).then((r) => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.text();
+    });
+    load
+      .then((text) => {
+        const rec = parseRecording(text);
+        startFromRecording();
+        stop = startReplay(
+          rec,
+          replaySpeed,
+          (ms) => setSt((s) => s && { ...s, progressMs: ms, durationMs: rec.durationMs }),
+          () => setSt((s) => s && { ...s, ended: true }),
+        );
+      })
+      .catch((e) => setSt((s) => s && { ...s, error: e instanceof Error ? e.message : String(e) }));
+    const t = setInterval(() => tracker.tick(), 100);
+    return () => {
+      stop?.();
+      clearInterval(t);
+    };
+  }, []);
+  return st;
+}
+
+/** App desktop: grava os eventos recebidos quando o app pede (botão, bandeja ou Ctrl+Shift+R). */
+function useRecorder(): { events: number; durationMs: number } | null {
+  const [status, setStatus] = useState<{ events: number; durationMs: number } | null>(null);
+  useEffect(() => {
+    if (!desktop || isDemo || isReplay) return;
+    const api = desktop;
+    let rec: Recorder | null = null;
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const off = api.onRecorderCommand(async (c) => {
+      if (c.cmd === 'start' && !rec) {
+        rec = new Recorder((chunk) => api.recorderAppend(chunk), { includePrivateChat: !!c.includePrivateChat });
+        rec.start();
+        timer = setInterval(() => {
+          if (!rec) return;
+          const s = rec.status();
+          setStatus(s);
+          api.recorderStatus(s);
+        }, 1000);
+        setStatus({ events: 0, durationMs: 0 });
+      } else if (c.cmd === 'stop' && rec) {
+        const r = rec;
+        rec = null;
+        if (timer) clearInterval(timer);
+        setStatus(null);
+        await api.recorderFinish(await r.stop());
+      }
+    });
+    return () => {
+      off();
+      if (timer) clearInterval(timer);
+    };
+  }, []);
+  return status;
+}
 
 /** No app desktop: overlay destravado mostra borda e pode ser arrastado. */
 function useUnlocked(): boolean {
@@ -46,12 +128,27 @@ function UnlockBar() {
   );
 }
 
+function ReplayBar({ r }: { r: ReplayState }) {
+  if (r.error) return <div className="ov-replay error">Não consegui abrir a gravação: {r.error}</div>;
+  const pct = r.durationMs ? (r.progressMs / r.durationMs) * 100 : 0;
+  return (
+    <div className="ov-replay">
+      <span>{r.ended ? '■ Fim da gravação' : `▶ Gravação · ${replaySpeed}x`}</span>
+      <span>{mmss(r.progressMs)} / {mmss(r.durationMs)}</span>
+      <div className="ov-replay-track"><div style={{ width: `${pct}%` }} /></div>
+    </div>
+  );
+}
+
 export default function Overlay() {
   const snap = useSyncExternalStore(tracker.subscribe, tracker.get);
-  const [mode, setMode] = useState<ConnectionMode | 'demo'>(isDemo ? 'demo' : 'connecting');
+  const [mode, setMode] = useState<Mode>(isDemo ? 'demo' : isReplay ? 'replay' : 'connecting');
   const unlocked = useUnlocked();
+  const replay = useReplay();
+  const recording = useRecorder();
 
   useEffect(() => {
+    if (isReplay) return; // useReplay cuida de tudo
     if (isDemo) {
       startDemo();
       return;
@@ -90,10 +187,14 @@ export default function Overlay() {
   return (
     <div className="ov-panel">
       {unlocked && <UnlockBar />}
+      {replay && <ReplayBar r={replay} />}
       <div className="ov-head">
         <b>BLM {snap.player.level ? `· nv ${snap.player.level}` : ''}</b>
-        <span className={`ov-mode ${mode === 'demo' ? 'demo' : ''}`}>
-          {MODE_LABEL[mode]}{snap.gaugeSource === 'cactbot' ? ' + cactbot' : ''}
+        <span style={{ display: 'flex', gap: 6 }}>
+          {recording && <span className="ov-rec">● REC {mmss(recording.durationMs)}</span>}
+          <span className={`ov-mode ${mode === 'demo' || mode === 'replay' ? 'demo' : ''}`}>
+            {MODE_LABEL[mode]}{snap.gaugeSource === 'cactbot' ? ' + cactbot' : ''}
+          </span>
         </span>
       </div>
 
