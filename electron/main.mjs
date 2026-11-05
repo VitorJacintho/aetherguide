@@ -24,7 +24,11 @@ const DIST = join(HERE, '..', 'dist');
 const PRELOAD = join(HERE, 'preload.cjs');
 const DEV_URL = process.env.VITE_DEV_SERVER_URL || null;
 const SELFTEST = process.argv.includes('--selftest');
-const ALL_MODULES = ['coach', 'gauge', 'dot', 'cds', 'burst', 'food', 'chat'];
+// mesma ordem e padrões de src/overlay/modules.ts
+const ALL_MODULES = ['callouts', 'duty', 'voice', 'coach', 'gauge', 'dot', 'cds', 'burst', 'food', 'chat'];
+const DEFAULT_MODULES = ALL_MODULES.filter((m) => m !== 'voice');
+/** módulos que existiam até a v0.2.0 (para ligar os novos em quem atualizar) */
+const LEGACY_MODULES = ['coach', 'gauge', 'dot', 'cds', 'burst', 'food', 'chat'];
 // alto o bastante para 3 avisos de chat; a área vazia é transparente e não bloqueia cliques quando travado
 const OVERLAY_SIZE = { width: 380, height: 760 };
 const SHORTCUTS = {
@@ -55,7 +59,8 @@ const DEFAULTS = {
     locked: false,
     source: 'ws',
     wsUrl: 'ws://127.0.0.1:10501/ws',
-    modules: ALL_MODULES,
+    modules: DEFAULT_MODULES,
+    knownModules: ALL_MODULES,
     x: null,
     y: null,
     replayFile: null,
@@ -68,17 +73,28 @@ let settings = structuredClone(DEFAULTS);
 const settingsFile = () => join(app.getPath('userData'), 'settings.json');
 
 function loadSettings() {
+  let saved = null;
   try {
-    const saved = JSON.parse(readFileSync(settingsFile(), 'utf8'));
-    settings = {
-      overlay: { ...DEFAULTS.overlay, ...saved.overlay },
-      recorder: { ...DEFAULTS.recorder, ...saved.recorder },
-    };
+    saved = JSON.parse(readFileSync(settingsFile(), 'utf8'));
   } catch {
-    settings = structuredClone(DEFAULTS);
+    // primeira execução (ou arquivo corrompido): usa os padrões
   }
+  settings = {
+    overlay: { ...DEFAULTS.overlay, ...saved?.overlay },
+    recorder: { ...DEFAULTS.recorder, ...saved?.recorder },
+  };
   // reprodução é temporária: ao abrir o app, volta para o jogo ao vivo
   if (settings.overlay.source === 'replay') settings.overlay.source = 'ws';
+  // módulos novos começam ligados para quem já tinha configurações salvas.
+  // Atenção: ler do arquivo salvo, não do objeto já misturado com os padrões.
+  if (saved?.overlay) {
+    const known = new Set(Array.isArray(saved.overlay.knownModules) ? saved.overlay.knownModules : LEGACY_MODULES);
+    const added = DEFAULT_MODULES.filter((m) => !known.has(m));
+    if (added.length) {
+      settings.overlay.modules = ALL_MODULES.filter((m) => settings.overlay.modules.includes(m) || added.includes(m));
+    }
+  }
+  settings.overlay.knownModules = ALL_MODULES;
 }
 
 function saveSettings() {

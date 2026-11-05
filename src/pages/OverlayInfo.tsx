@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { OVERLAY_MODULES, type ModuleId } from '../overlay/modules';
+import { DEFAULT_MODULE_IDS, OVERLAY_MODULES, type ModuleId } from '../overlay/modules';
 import { XIVAPI_INFO } from '../data/xivapi';
 import {
   desktop, type DesktopApi, type DesktopSettings, type OverlaySettings, type RecorderStatus, type RecordingInfo,
@@ -182,7 +182,7 @@ function DesktopPanel({ api }: { api: DesktopApi }) {
 }
 
 export default function OverlayInfo() {
-  const [enabled, setEnabled] = useState<Set<ModuleId>>(() => new Set(OVERLAY_MODULES.map((m) => m.id)));
+  const [enabled, setEnabled] = useState<Set<ModuleId>>(() => new Set(DEFAULT_MODULE_IDS));
 
   // no app desktop, os módulos escolhidos aqui valem para a janela de overlay
   useEffect(() => {

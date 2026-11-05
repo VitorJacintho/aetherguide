@@ -57,6 +57,7 @@ Use `PORT=10599 npm run fake-act` se o ACT estiver aberto.
 | Progressão | Escolha seu nível → rotação certa, habilidades novas e próximos desbloqueios |
 | Rotação | Recursos do BLM explicados, loop do nível 100, AoE, movimento, downtime, erros comuns |
 | Treinar rotação | Simulador: você escolhe a magia, ele diz se foi a melhor e por quê |
+| Dungeons & Trials | 200 duties com as mecânicas dos chefes explicadas em português e o que o Black Mage deve fazer |
 | Analisar logs | Lê uma luta do FFLogs e aponta o que melhorar (tempo parado, Thunder, Polyglot, cooldowns, Ley Lines, mortes) |
 | Build & Gear | Atributos, Materia, comida/poção, onde conseguir equipamento |
 | Comunicação & RP | Glossário, tradutor de gírias, frases prontas EN↔PT, etiqueta, comandos, guia de RP |
@@ -75,6 +76,22 @@ Use `PORT=10599 npm run fake-act` se o ACT estiver aberto.
 
 Com o **cactbot** instalado o gauge vem direto do jogo; sem ele, é estimado pelas magias usadas.
 Magias e efeitos são reconhecidos pelo ID oficial do jogo, então funciona com o cliente em qualquer idioma.
+
+## Guias de dungeons e trials
+
+```bash
+npm run fetch:duties   # gera src/data/duties.json
+```
+
+- A lista de dungeons e trials (nome, nível, item level, expansão, zona) vem da **XIVAPI**.
+- As mecânicas — o ID de cada habilidade dos chefes e o tipo (tankbuster, espalhar, juntar, knockback…) — vêm
+  dos gatilhos do **[cactbot](https://github.com/OverlayPlugin/cactbot)** (Apache-2.0). Veja
+  [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- O que cada tipo significa e o que o Black Mage deve fazer está em português em `src/data/mechanics.ts`.
+- No overlay: ao entrar numa duty (evento de zona do ACT/IINACT) aparece o guia; quando um chefe **começa a
+  conjurar** uma mecânica conhecida (linha 20 do log), aparece o aviso — e, se o módulo de voz estiver ligado,
+  ele é falado em português.
+- `FAKE_DUTY="Nome da duty" npm run fake-act` simula a dungeon escolhida.
 
 ## Análise de logs (FFLogs)
 

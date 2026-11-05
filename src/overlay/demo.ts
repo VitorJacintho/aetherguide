@@ -3,7 +3,23 @@
  * para testar o overlay sem abrir o jogo (overlay.html?demo=1).
  */
 import { canUse, gcdLength, recommend } from '../engine/blm';
+import { loadDuties } from '../data/duties';
+import { kindInfo } from '../data/mechanics';
 import { clock, tracker } from './tracker';
+
+/** Simula estar numa dungeon real, com avisos de mecânica a cada ~11 s. */
+async function demoDuty() {
+  const duty = (await loadDuties()).find((d) => d.name === 'Ihuykatumu');
+  if (!duty) return;
+  tracker.setZone(duty.zoneId, duty.name, duty);
+  const mechanics = duty.mechanics.filter((m) => m.kind !== 'custom');
+  let i = 0;
+  setInterval(() => {
+    const m = mechanics[i++ % mechanics.length];
+    const k = kindInfo(m.kind);
+    tracker.callout({ icon: k.icon, label: k.label, name: m.name, text: k.callout }, 5);
+  }, 11000);
+}
 
 const SAMPLE_CHAT: [string, string][] = [
   ['Tank Lalafell', 'o/ hi all, W2W ok?'],
@@ -17,6 +33,7 @@ const SAMPLE_CHAT: [string, string][] = [
 export function startDemo() {
   tracker.setPlayer({ name: 'Demo Black Mage', level: 100, isBlm: true });
   tracker.setFood(9 * 60);
+  void demoDuty();
 
   const start = clock();
   let nextGcd = start + 1;

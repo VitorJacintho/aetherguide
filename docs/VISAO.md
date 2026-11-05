@@ -56,8 +56,10 @@ FFXIV é enorme e pouco amigável para quem chega agora:
 3. ~~**Análise de log** (FFLogs API)~~ ✅ primeira versão: tempo conjurando, Thunder, Polyglot,
    cooldowns, Ley Lines, Flare Star/Despair, magias canceladas, poções, mortes e linha do tempo.
    Próximos passos: comparar com o melhor parse da mesma luta e explicar mecânicas por timestamp.
-4. **Guia de dungeon/trial**: mecânicas de cada conteúdo em linguagem simples, com foco no
-   que o BLM precisa fazer (onde colocar Ley Lines, quando usar Addle).
+4. ~~**Guia de dungeon/trial**~~ ✅ 200 duties (139 com mecânicas, via cactbot), página no app,
+   guia automático no overlay ao entrar na duty, avisos de mecânica e voz em português.
+   Próximos passos: dicas escritas à mão para as dungeons da MSQ e avisos para mecânicas sem
+   conjuração (marcadores na cabeça, tethers).
 5. ~~**App desktop**~~ ✅ Electron: janela de overlay própria (transparente, sempre por cima,
    clique atravessa), bandeja, atalhos globais, instalador e versão portátil.
    Próximos passos: vários overlays independentes, escala/opacidade, atalhos para frases prontas

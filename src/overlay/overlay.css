@@ -11,6 +11,19 @@ body.ov-unlocked .ov-panel { outline: 2px dashed var(--gold); outline-offset: 2p
 .ov-dragbar { font-size: .72rem; color: #1a1030; background: var(--gold); border-radius: 7px; padding: 3px 8px; text-align: center; text-shadow: none; }
 .ov-dragbar b { color: #1a1030; }
 
+/* avisos de mecânica e guia da dungeon */
+.ov-callout { background: linear-gradient(90deg, rgba(255, 93, 115, .35), rgba(255, 122, 61, .2)); border: 1px solid var(--bad);
+  border-radius: 9px; padding: 6px 9px; animation: callout-in .25s ease-out; }
+.ov-callout b { color: #fff; letter-spacing: .03em; }
+.ov-callout small { display: block; font-size: .85rem; color: #ffe1e6; margin-top: 2px; }
+.ov-callout-icon { font-size: 1.05rem; }
+.ov-callout-time { float: right; font-weight: 700; color: #fff; }
+/* só escala: se a animação não rodar (janela em segundo plano), o aviso continua visível */
+@keyframes callout-in { from { transform: scale(.94); } to { transform: none; } }
+.ov-duty { font-size: .8rem; border: 1px solid rgba(92, 200, 255, .4); background: rgba(92, 200, 255, .08); border-radius: 9px; padding: 5px 9px; }
+.ov-duty small { color: var(--muted); }
+.ov-duty-tip { display: block; margin-top: 2px; }
+
 /* gravação e reprodução */
 .ov-rec { font-size: .7rem; color: #fff; background: var(--bad); border-radius: 99px; padding: 0 8px; animation: pulse-rec 1s infinite alternate; }
 @keyframes pulse-rec { from { opacity: 1; } to { opacity: .55; } }
@@ -61,7 +74,7 @@ body.ov-unlocked .ov-panel { outline: 2px dashed var(--gold); outline-offset: 2p
 .ov-chat { background: rgba(92, 200, 255, .08); border: 1px solid rgba(92, 200, 255, .35); border-radius: 9px; padding: 5px 9px; font-size: .78rem; animation: fadein .3s; }
 .ov-chat small { display: block; color: var(--muted); }
 .ov-chat small span { color: var(--ice); font-weight: 700; }
-@keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes fadein { from { transform: translateY(4px); } to { transform: none; } }
 
 /* gauge compacto dentro do overlay */
 body.overlay .gauge { gap: 6px; }

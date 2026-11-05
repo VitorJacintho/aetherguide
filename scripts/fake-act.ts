@@ -22,6 +22,12 @@ const BOSS = { id: 0x40000001, name: 'Striking Dummy' };
 const HEALER = { id: 0x10111111, name: 'Fake Astro' };
 
 const xivapi = JSON.parse(readFileSync(join(import.meta.dirname, '..', 'src', 'data', 'xivapi.json'), 'utf8'));
+
+/** Dungeon simulada (FAKE_DUTY="Nome"), com os chefes conjurando as mecânicas reais a cada 8 s. */
+const dutyFile = JSON.parse(readFileSync(join(import.meta.dirname, '..', 'src', 'data', 'duties.json'), 'utf8'));
+const DUTY = dutyFile.duties.find((d: any) => d.name === (process.env.FAKE_DUTY ?? 'Ihuykatumu'));
+const DUTY_CASTS = (DUTY?.mechanics ?? []).filter((m: any) => m.kind !== 'custom' || m.note);
+const ZONE = DUTY ? { id: DUTY.zoneId as number, name: DUTY.name as string } : { id: 1, name: 'Fake Training Grounds' };
 const hex = (n: number) => n.toString(16).toUpperCase();
 const actionHex = (key: string) => hex(xivapi.actions[key]?.ids?.[0] ?? 0);
 const statusHex = (name: string) => hex(xivapi.statuses[name]?.ids?.[0] ?? 0);
@@ -66,6 +72,8 @@ let llUntil: number | null = null;
 let nextChat = 3;
 let nextBurst = 8;
 let chatIdx = 0;
+let nextBossCast = 4;
+let castIdx = 0;
 
 function use(id: ActionId) {
   const before = state;
@@ -117,15 +125,20 @@ function tick() {
     gain('Divination', 20, HEALER, PLAYER);
     nextBurst = elapsed + 120;
   }
+  if (DUTY_CASTS.length && elapsed >= nextBossCast) {
+    const m = DUTY_CASTS[castIdx++ % DUTY_CASTS.length];
+    line('20', now(), '40000002', m.boss ?? BOSS.name, hex(m.ids[0]), m.name, hex(PLAYER.id), PLAYER.name, '4.00', '0', '0', '0', '0');
+    nextBossCast = elapsed + 8;
+  }
   // linha "barulhenta" de HP, que a gravação deve descartar
   line('39', now(), hex(PLAYER.id), PLAYER.name, '100000', '100000', String(Math.round(state.mp)), '10000');
 }
 
 function greet(ws: WebSocket) {
   send(ws, { type: 'ChangePrimaryPlayer', charID: PLAYER.id, charName: PLAYER.name });
-  send(ws, { type: 'ChangeZone', zoneID: 1, zoneName: 'Fake Training Grounds' });
+  send(ws, { type: 'ChangeZone', zoneID: ZONE.id, zoneName: ZONE.name });
   send(ws, { type: 'LogLine', line: ['02', now(), hex(PLAYER.id), PLAYER.name], rawLine: '' });
-  send(ws, { type: 'LogLine', line: ['01', now(), '1', 'Fake Training Grounds'], rawLine: '' });
+  send(ws, { type: 'LogLine', line: ['01', now(), hex(ZONE.id), ZONE.name], rawLine: '' });
   const wf = ['26', now(), statusHex('Well Fed'), 'Well Fed', '1800.00', hex(PLAYER.id), PLAYER.name, hex(PLAYER.id), PLAYER.name, '00'];
   send(ws, { type: 'LogLine', line: wf, rawLine: wf.join('|') });
 }

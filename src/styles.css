@@ -153,6 +153,13 @@ tr.next td { background: #b48cff10; }
 .history { display: flex; flex-wrap: wrap; gap: 4px; }
 .history .chip.wrong { border-color: var(--bad); }
 
+/* ---------- dungeons ---------- */
+.mech { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+.mech:last-child { border-bottom: none; }
+.mech-icon { font-size: 1.4rem; text-align: center; }
+tr.clickable-row { cursor: pointer; }
+tr.clickable-row:hover td { background: #b48cff10; }
+
 /* ---------- análise de logs ---------- */
 .finding { border-left-width: 4px; }
 .finding.good { border-left-color: var(--ok); }

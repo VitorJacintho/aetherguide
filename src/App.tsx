@@ -8,14 +8,17 @@ import Comunicacao from './pages/Comunicacao';
 import Ferramentas from './pages/Ferramentas';
 import OverlayInfo from './pages/OverlayInfo';
 import Analise from './pages/Analise';
+import Dungeons from './pages/Dungeons';
 
-export type PageId = 'inicio' | 'progressao' | 'rotacao' | 'treino' | 'analise' | 'build' | 'comunicacao' | 'ferramentas' | 'overlay';
+export type PageId =
+  | 'inicio' | 'progressao' | 'rotacao' | 'treino' | 'dungeons' | 'analise' | 'build' | 'comunicacao' | 'ferramentas' | 'overlay';
 
 const PAGES: { id: PageId; label: string; icon: string }[] = [
   { id: 'inicio', label: 'Início', icon: '🏠' },
   { id: 'progressao', label: 'Progressão', icon: '📈' },
   { id: 'rotacao', label: 'Rotação', icon: '🔥' },
   { id: 'treino', label: 'Treinar rotação', icon: '🎯' },
+  { id: 'dungeons', label: 'Dungeons & Trials', icon: '🗺️' },
   { id: 'analise', label: 'Analisar logs', icon: '📊' },
   { id: 'build', label: 'Build & Gear', icon: '🛡️' },
   { id: 'comunicacao', label: 'Comunicação & RP', icon: '💬' },
@@ -70,6 +73,7 @@ export default function App() {
         {page === 'progressao' && <Progressao />}
         {page === 'rotacao' && <Rotacao go={go} />}
         {page === 'treino' && <Treino />}
+        {page === 'dungeons' && <Dungeons />}
         {page === 'analise' && <Analise />}
         {page === 'build' && <Build />}
         {page === 'comunicacao' && <Comunicacao />}

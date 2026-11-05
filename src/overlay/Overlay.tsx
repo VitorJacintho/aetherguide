@@ -8,7 +8,10 @@ import { startDemo } from './demo';
 import { startFromRecording, startLive } from './live';
 import { Recorder, parseRecording, startReplay } from './recording';
 import { tracker } from './tracker';
-import { ALL_MODULE_IDS, type ModuleId } from './modules';
+import { ALL_MODULE_IDS, DEFAULT_MODULE_IDS, type ModuleId } from './modules';
+import { dutyTitle } from '../data/duties';
+import { DUTY_TIPS } from '../data/mechanics';
+import type { Callout } from './tracker';
 
 const params = new URLSearchParams(window.location.search);
 const isDemo = params.get('demo') === '1';
@@ -18,8 +21,26 @@ const replayFile = params.get('replayFile');
 const isReplay = !!(replayUrl || replayFile);
 const replaySpeed = Math.min(16, Math.max(0.25, Number(params.get('speed')) || 1));
 const modules = new Set<ModuleId>(
-  params.get('modules')?.split(',').filter((m): m is ModuleId => (ALL_MODULE_IDS as string[]).includes(m)) ?? ALL_MODULE_IDS,
+  params.get('modules')?.split(',').filter((m): m is ModuleId => (ALL_MODULE_IDS as string[]).includes(m)) ?? DEFAULT_MODULE_IDS,
 );
+
+/** Lê os avisos de mecânica em voz alta, em português (se houver voz pt no sistema). */
+function useVoice(callouts: Callout[]) {
+  const [spoken] = useState(() => new Set<number>());
+  useEffect(() => {
+    if (!modules.has('voice') || !('speechSynthesis' in window)) return;
+    for (const c of callouts) {
+      if (spoken.has(c.id)) continue;
+      spoken.add(c.id);
+      const u = new SpeechSynthesisUtterance(c.text);
+      u.lang = 'pt-BR';
+      u.rate = 1.15;
+      const voice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith('pt'));
+      if (voice) u.voice = voice;
+      speechSynthesis.speak(u);
+    }
+  }, [callouts, spoken]);
+}
 
 type Mode = ConnectionMode | 'demo' | 'replay';
 const CD_LIST: OgcdId[] = ['leyLines', 'triplecast', 'swiftcast', 'manafont', 'amplifier'];
@@ -146,6 +167,7 @@ export default function Overlay() {
   const unlocked = useUnlocked();
   const replay = useReplay();
   const recording = useRecorder();
+  useVoice(snap.callouts);
 
   useEffect(() => {
     if (isReplay) return; // useReplay cuida de tudo
@@ -197,6 +219,23 @@ export default function Overlay() {
           </span>
         </span>
       </div>
+
+      {modules.has('callouts') && snap.callouts.map((c) => (
+        <div key={c.id} className="ov-callout">
+          <div><span className="ov-callout-icon">{c.icon}</span> <b>{c.label.toUpperCase()}</b> · {c.name}
+            <span className="ov-callout-time">{Math.max(0, Math.ceil(c.until - now))}</span>
+          </div>
+          <small>{c.text}</small>
+        </div>
+      ))}
+
+      {modules.has('duty') && snap.duty && (
+        <div className="ov-duty">
+          📖 <b>{dutyTitle(snap.duty.name)}</b>
+          <small> · nv {snap.duty.level} · {snap.duty.mechanics.length > 0 ? `${new Set(snap.duty.mechanics.map((m) => m.name)).size} mecânicas no guia` : 'só dicas gerais'}</small>
+          <small className="ov-duty-tip">{DUTY_TIPS[snap.duty.type][Math.floor(now / 20) % DUTY_TIPS[snap.duty.type].length]}</small>
+        </div>
+      )}
 
       {notBlm && <p className="ov-small">Troque para Black Mage para ver o gauge e o coach.</p>}
 

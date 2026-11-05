@@ -6,6 +6,20 @@
 import { ACTION_BY_LOG_NAME, ACTION_NAMES, MAX_MP, advance, applyAction, initialState, type ActionId, type BlmState } from '../engine/blm';
 import { findTerms, type GlossaryEntry } from '../data/glossary';
 import { ACTION_KEY_BY_GAME_ID } from '../data/xivapi';
+import type { Duty } from '../data/duties';
+
+/** Aviso de mecânica na tela (e na voz). */
+export interface Callout {
+  id: number;
+  icon: string;
+  label: string;
+  /** nome da habilidade do chefe (inglês, como na barra de conjuração) */
+  name: string;
+  /** o que fazer, em português */
+  text: string;
+  at: number;
+  until: number;
+}
 
 export interface ChatNote {
   id: number;
@@ -24,6 +38,10 @@ export interface Snapshot {
   player: { name: string | null; level: number | null; isBlm: boolean | null };
   gaugeSource: 'inferido' | 'cactbot';
   lastAction: ActionId | null;
+  zone: { id: number; name: string } | null;
+  /** dungeon/trial atual, se tivermos guia para ela */
+  duty: Duty | null;
+  callouts: Callout[];
 }
 
 /** Buffs/debuffs de party que marcam a janela de burst (~a cada 2 min). */
@@ -50,6 +68,7 @@ class Tracker {
   private snap: Snapshot;
   private listeners = new Set<() => void>();
   private chatSeq = 0;
+  private calloutSeq = 0;
 
   constructor() {
     const now = clock();
@@ -62,7 +81,21 @@ class Tracker {
       player: { name: null, level: null, isBlm: null },
       gaugeSource: 'inferido',
       lastAction: null,
+      zone: null,
+      duty: null,
+      callouts: [],
     };
+  }
+
+  setZone(id: number, name: string, duty: Duty | null) {
+    this.set({ zone: { id, name }, duty, callouts: [] });
+  }
+
+  /** Mostra um aviso de mecânica por `seconds` segundos (no máximo 2 na tela). */
+  callout(c: Omit<Callout, 'id' | 'at' | 'until'>, seconds: number) {
+    const now = clock();
+    const active = this.snap.callouts.filter((x) => x.until > now && x.name !== c.name);
+    this.set({ callouts: [...active, { ...c, id: this.calloutSeq++, at: now, until: now + seconds }].slice(-2) });
   }
 
   subscribe = (fn: () => void) => {
@@ -86,6 +119,7 @@ class Tracker {
       blm,
       burst: this.snap.burst && this.snap.burst.until > now ? this.snap.burst : null,
       chat: this.snap.chat.filter((c) => now - c.at < CHAT_NOTE_TTL),
+      callouts: this.snap.callouts.some((c) => c.until <= now) ? this.snap.callouts.filter((c) => c.until > now) : this.snap.callouts,
     });
   }
 
@@ -100,6 +134,7 @@ class Tracker {
       chat: [],
       lastAction: null,
       gaugeSource: 'inferido',
+      callouts: [],
     });
   }
 

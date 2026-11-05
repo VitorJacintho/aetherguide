@@ -3,7 +3,9 @@
  *
  * Linhas de log usadas (formato do OverlayPlugin, campos separados em `line[]`):
  *  00 ChatLog       [00, hora, canal(hex), remetente, mensagem]
+ *  01 ChangeZone    [01, hora, zonaId(hex), zonaNome]
  *  02 ChangePrimary [02, hora, id, nome]
+ *  20 StartsCasting [20, hora, origemId, origemNome, acaoId, acaoNome, alvoId, alvoNome, duracaoConjuracao, ...]
  *  21/22 Ability    [21, hora, origemId, origemNome, acaoId, acaoNome, alvoId, alvoNome, ...]
  *  26 GainsEffect   [26, hora, efeitoId, efeitoNome, duracao, origemId, origemNome, alvoId, alvoNome, ...]
  *  30 LosesEffect   [30, hora, efeitoId, efeitoNome, '', origemId, origemNome, alvoId, alvoNome, ...]
@@ -12,8 +14,38 @@
  * funciona com o cliente em qualquer idioma. O nome em inglês fica como reserva.
  */
 import { STATUS_NAME_BY_GAME_ID } from '../data/xivapi';
+import { loadDuties, type DutyMechanic } from '../data/duties';
+import { kindInfo } from '../data/mechanics';
 import { call, connect, on, type ConnectionMode } from './overlayApi';
 import { tracker } from './tracker';
+
+/* ---------------- dungeon atual e avisos de mecânica ---------------- */
+
+/** habilidades dos chefes da duty atual: ID do jogo → mecânica */
+let mechanicsById = new Map<number, DutyMechanic>();
+let currentZone = -1;
+
+async function enterZone(zoneId: number, zoneName: string) {
+  if (!Number.isFinite(zoneId) || zoneId === currentZone) return;
+  currentZone = zoneId;
+  const duty = (await loadDuties()).find((d) => d.zoneId === zoneId) ?? null;
+  if (zoneId !== currentZone) return; // mudou de zona enquanto carregava
+  mechanicsById = new Map(duty ? duty.mechanics.flatMap((m) => m.ids.map((id) => [id, m] as const)) : []);
+  tracker.setZone(zoneId, zoneName, duty);
+}
+
+/** Um inimigo começou a conjurar: se for uma mecânica conhecida, mostra o aviso. */
+function enemyStartsCasting(line: string[]) {
+  // IDs de jogadores começam com 1; de inimigos, com 4
+  if (!line[2]?.startsWith('4')) return;
+  const m = mechanicsById.get(parseInt(line[4] ?? '', 16));
+  if (!m) return;
+  const k = kindInfo(m.kind);
+  // "custom" sem dica específica não ajuda o jogador: ignora
+  if (m.kind === 'custom' && !m.note) return;
+  const castTime = parseFloat(line[8] ?? '') || 3;
+  tracker.callout({ icon: k.icon, label: k.label, name: m.name, text: m.kind === 'custom' ? m.note! : k.callout }, castTime + 2.5);
+}
 
 /** Canais de chat de jogadores (say, shout, tell, party, alliance, FC, yell, linkshells, CWLS). */
 const PLAYER_CHANNELS = new Set([
@@ -42,6 +74,14 @@ function handleLine(line: string[]) {
   if (type === '00') {
     const channel = (line[2] ?? '').toUpperCase();
     if (PLAYER_CHANNELS.has(channel)) tracker.chat(line[3] ?? '', line[4] ?? '');
+    return;
+  }
+  if (type === '01') {
+    void enterZone(parseInt(line[2] ?? '', 16), line[3] ?? '');
+    return;
+  }
+  if (type === '20') {
+    enemyStartsCasting(line);
     return;
   }
   if (type === '21' || type === '22') {
@@ -99,6 +139,7 @@ export function startFromRecording(): void {
 
 function registerHandlers() {
   on('LogLine', (e) => handleLine(e.line as string[]));
+  on('ChangeZone', (e) => void enterZone(Number(e.zoneID), String(e.zoneName ?? '')));
   on('ChangePrimaryPlayer', (e) => {
     playerId = Number(e.charID).toString(16).toUpperCase();
     playerName = e.charName;
