@@ -1,7 +1,7 @@
 {
   "source": "https://v2.xivapi.com",
   "gameVersion": "0874aee069e1e7c4",
-  "fetchedAt": "2026-11-05T12:19:25.975Z",
+  "fetchedAt": "2026-11-05T12:43:41.940Z",
   "actions": {
     "blizzard": {
       "name": "Blizzard",
@@ -457,6 +457,11 @@
         48
       ],
       "icon": "icons/status/well-fed.png"
+    },
+    "Medicated": {
+      "ids": [
+        49
+      ]
     },
     "Triplecast": {
       "ids": [

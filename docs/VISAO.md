@@ -53,8 +53,9 @@ FFXIV é enorme e pouco amigável para quem chega agora:
 1. ~~**Ícones e dados oficiais** via XIVAPI~~ ✅ feito: ícones, IDs do jogo (overlay em qualquer idioma) e
    conferência automática de níveis/recargas (`npm run fetch:xivapi`).
 2. **Perfil do personagem** (Lodestone): puxar nível do BLM e equipamento atual.
-3. **Análise de log** (FFLogs API): "Você deixou o Polyglot transbordar 3 vezes", "Thunder
-   caiu do alvo 12% da luta".
+3. ~~**Análise de log** (FFLogs API)~~ ✅ primeira versão: tempo conjurando, Thunder, Polyglot,
+   cooldowns, Ley Lines, Flare Star/Despair, magias canceladas, poções, mortes e linha do tempo.
+   Próximos passos: comparar com o melhor parse da mesma luta e explicar mecânicas por timestamp.
 4. **Guia de dungeon/trial**: mecânicas de cada conteúdo em linguagem simples, com foco no
    que o BLM precisa fazer (onde colocar Ley Lines, quando usar Addle).
 5. **App desktop** (Tauri ou Electron): ícone na bandeja, janela de overlay própria e

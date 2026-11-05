@@ -50,6 +50,16 @@ export const STATUS_NAME_BY_GAME_ID = new Map<number, string>(
   Object.entries(data.statuses).flatMap(([name, s]) => s.ids.map((id) => [id, name] as [number, string])),
 );
 
+/** IDs de jogo de um status pelo nome canônico (ex.: "High Thunder" → [3871, 3872]). */
+export function statusIds(name: string): number[] {
+  return data.statuses[name]?.ids ?? [];
+}
+
+/** IDs de jogo de uma ação pela chave interna (ex.: "fire4" → [3577]). */
+export function actionGameIds(key: string): number[] {
+  return data.actions[key]?.ids ?? [];
+}
+
 /** Nomes das ações do mais longo para o mais curto ("Fire IV" antes de "Fire"). */
 const NAMES = Object.entries(data.actions)
   .map(([key, a]) => ({ key, name: a.name.toLowerCase() }))

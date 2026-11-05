@@ -17,7 +17,7 @@ const HEADERS = { 'User-Agent': 'aetherguide-data-fetch (fan project)' };
 
 /** Status que o overlay acompanha. A chave é o nome canônico (inglês). */
 const STATUSES = [
-  'Thunderhead', 'Firestarter', 'Circle of Power', 'Well Fed', 'Triplecast', 'Swiftcast',
+  'Thunderhead', 'Firestarter', 'Circle of Power', 'Well Fed', 'Medicated', 'Triplecast', 'Swiftcast',
   // o DoT do High Thunder II também se chama "High Thunder" no jogo
   'High Thunder', 'Thunder', 'Thunder II', 'Thunder III', 'Thunder IV',
   'Divination', 'Battle Litany', 'Brotherhood', 'Technical Finish', 'Embolden', 'Searing Light',

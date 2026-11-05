@@ -18,6 +18,7 @@ npm run build      # gera dist/ (abre direto do disco, inclusive no ACT)
 | Progressão | Escolha seu nível → rotação certa, habilidades novas e próximos desbloqueios |
 | Rotação | Recursos do BLM explicados, loop do nível 100, AoE, movimento, downtime, erros comuns |
 | Treinar rotação | Simulador: você escolhe a magia, ele diz se foi a melhor e por quê |
+| Analisar logs | Lê uma luta do FFLogs e aponta o que melhorar (tempo parado, Thunder, Polyglot, cooldowns, Ley Lines, mortes) |
 | Build & Gear | Atributos, Materia, comida/poção, onde conseguir equipamento |
 | Comunicação & RP | Glossário, tradutor de gírias, frases prontas EN↔PT, etiqueta, comandos, guia de RP |
 | Ferramentas | Calculadora de GCD (Spell Speed) e checklist diário/semanal com reset automático |
@@ -35,6 +36,18 @@ npm run build      # gera dist/ (abre direto do disco, inclusive no ACT)
 
 Com o **cactbot** instalado o gauge vem direto do jogo; sem ele, é estimado pelas magias usadas.
 Magias e efeitos são reconhecidos pelo ID oficial do jogo, então funciona com o cliente em qualquer idioma.
+
+## Análise de logs (FFLogs)
+
+A página **Analisar logs** usa a [API v2 do FFLogs](https://www.fflogs.com/api/docs):
+
+1. Crie um cliente em [fflogs.com/api/clients](https://www.fflogs.com/api/clients/) (redirect `http://localhost`,
+   sem marcar "Public Client").
+2. Cole o Client ID e o Client Secret na página. Eles ficam só no `localStorage` do seu navegador.
+3. Cole o link de um relatório público ou não listado e escolha a luta e o jogador.
+
+O botão **Ver um exemplo** mostra a análise de uma luta gerada pelo app (com erros de propósito), sem precisar
+de login. Código em `src/analysis/`.
 
 ## Dados oficiais e ícones (XIVAPI)
 

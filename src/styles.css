@@ -153,6 +153,28 @@ tr.next td { background: #b48cff10; }
 .history { display: flex; flex-wrap: wrap; gap: 4px; }
 .history .chip.wrong { border-color: var(--bad); }
 
+/* ---------- análise de logs ---------- */
+.finding { border-left-width: 4px; }
+.finding.good { border-left-color: var(--ok); }
+.finding.warn { border-left-color: var(--warn); }
+.finding.bad { border-left-color: var(--bad); }
+.finding.info { border-left-color: var(--accent); }
+.finding-head { display: flex; justify-content: space-between; gap: 10px; font-weight: 600; }
+.finding-head b { font-size: 1.15rem; }
+
+.tl { position: relative; margin-top: 8px; }
+.tl-burst { position: relative; height: 6px; margin-bottom: 3px; }
+.tl-burst > div { position: absolute; top: 0; height: 100%; background: var(--gold); border-radius: 3px; opacity: .8; }
+.tl-bar { position: relative; height: 26px; background: var(--bg-2); border-radius: 6px; overflow: visible; border: 1px solid var(--border); }
+.tl-bar > div { position: absolute; top: 0; height: 100%; }
+.tl-AF { background: #ff7a3d99; }
+.tl-UI { background: #5cc8ff99; }
+.tl-none { background: transparent; }
+.tl-idle { background: repeating-linear-gradient(45deg, var(--bad), var(--bad) 3px, transparent 3px, transparent 6px); z-index: 1; }
+.tl-death { position: absolute; top: 2px; transform: translateX(-50%); font-size: 16px; z-index: 2; }
+.tl-axis { position: relative; height: 16px; font-size: .7rem; color: var(--muted); }
+.tl-axis span { position: absolute; top: 2px; transform: translateX(-50%); }
+
 @media (max-width: 800px) {
   .layout { grid-template-columns: 1fr; }
   .sidebar { position: static; height: auto; }

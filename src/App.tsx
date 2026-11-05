@@ -7,14 +7,16 @@ import Build from './pages/Build';
 import Comunicacao from './pages/Comunicacao';
 import Ferramentas from './pages/Ferramentas';
 import OverlayInfo from './pages/OverlayInfo';
+import Analise from './pages/Analise';
 
-export type PageId = 'inicio' | 'progressao' | 'rotacao' | 'treino' | 'build' | 'comunicacao' | 'ferramentas' | 'overlay';
+export type PageId = 'inicio' | 'progressao' | 'rotacao' | 'treino' | 'analise' | 'build' | 'comunicacao' | 'ferramentas' | 'overlay';
 
 const PAGES: { id: PageId; label: string; icon: string }[] = [
   { id: 'inicio', label: 'Início', icon: '🏠' },
   { id: 'progressao', label: 'Progressão', icon: '📈' },
   { id: 'rotacao', label: 'Rotação', icon: '🔥' },
   { id: 'treino', label: 'Treinar rotação', icon: '🎯' },
+  { id: 'analise', label: 'Analisar logs', icon: '📊' },
   { id: 'build', label: 'Build & Gear', icon: '🛡️' },
   { id: 'comunicacao', label: 'Comunicação & RP', icon: '💬' },
   { id: 'ferramentas', label: 'Ferramentas', icon: '🧰' },
@@ -68,6 +70,7 @@ export default function App() {
         {page === 'progressao' && <Progressao />}
         {page === 'rotacao' && <Rotacao go={go} />}
         {page === 'treino' && <Treino />}
+        {page === 'analise' && <Analise />}
         {page === 'build' && <Build />}
         {page === 'comunicacao' && <Comunicacao />}
         {page === 'ferramentas' && <Ferramentas />}
